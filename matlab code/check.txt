@@ -1,0 +1,16 @@
+i=imread('green1.jpg');
+%imtool(i)
+j=rgb2gray(i)
+%imtool(j)
+m=i(:,:,2)
+%imtool(m)
+k=imsubtract(m,j)
+k=medfilt2(k,[2,2]);
+k=immultiply(k,3)
+imtool(k)
+l=im2bw(k,0.1)
+l=bwareaopen(l,200);
+l=imfill(l,'holes');
+imtool(l)
+
+check code

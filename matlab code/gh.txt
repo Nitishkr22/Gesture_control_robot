@@ -1,0 +1,41 @@
+clear
+clc
+m=actxcontrol('WMPlayer.ocx.7',[0,0,700,500]);
+m.CurrentMedia=m.newMedia('b.mp4');
+pause(3);
+m.Controls.pause;
+v=imaq.VideoDevice('winvideo',1,'RGB24_640x480','ReturnedColorSpace','rgb');
+preview(v)
+pause(2);
+closepreview(v);
+while(1)
+    
+i=step(v);
+pause(0.001)
+j=rgb2gray(i);
+k=i(:,:,2);
+g=imsubtract(k,j);
+g=medfilt2(g,[2,2]);
+g=immultiply(g,4);
+g=im2bw(g,0.10);
+g=bwareaopen(g,200);
+g=imfill(g,'holes');
+g=imclose(g,strel('disk',5));
+g=flip(g,2);
+imshow(g);
+
+[b,a]=bwlabel(g);
+if(a==1)
+   rp=regionprops(g);
+   rpc=rp.Centroid;
+   x=rpc(1);
+   y=rpc(2);
+   disp(x);
+   disp(y);
+   m.Controls.play;
+elseif(a==2)
+    m.Controls.pause;
+else
+    disp('object is not found');
+end
+end

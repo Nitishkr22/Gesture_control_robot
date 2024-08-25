@@ -1,0 +1,32 @@
+clc
+clear
+v=imaq.VideoDevice('winvideo',1,'MJPG_1280x720','ReturnedColorSpace','rgb');
+preview(v)
+pause(2);
+closepreview(v);
+while(1)
+    
+i=step(v);
+pause(0.001)
+j=rgb2gray(i);
+k=i(:,:,2);
+g=imsubtract(k,j);
+g=medfilt2(g,[2,2]);
+g=immultiply(g,4);
+g=im2bw(g,0.10);
+g=bwareaopen(g,200);
+g=imfill(g,'holes');
+g=imclose(g,strel('disk',5));
+imshow(g);
+g=flip(g,20);
+[b,a]=bwlabel(g);
+if(a==1)
+   rp=regionprops(g);
+   rpc=rp.centroid;
+   x=rpc(1);
+   y=rpc()2;
+   r.mouseMove(x,y);
+else
+    disp('object is not found');
+end
+end

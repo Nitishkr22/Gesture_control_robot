@@ -1,0 +1,39 @@
+clear
+clc
+s=serial('COM3','BaudRate',9600);
+fopen(s);
+v=imaq.VideoDevice('winvideo',1,'RGB24_640x480','ReturnedColorSpace','rgb');
+preview(v);
+%pause(2);
+closepreview(v);
+while(1)
+    
+i=step(v);
+pause(0.001)
+j=rgb2gray(i);
+k=i(:,:,2);
+g=imsubtract(k,j);
+g=medfilt2(g,[2,2]);
+g=immultiply(g,3);
+g=im2bw(g,0.10);
+g=bwareaopen(g,200);
+g=imfill(g,'holes');
+g=imclose(g,strel('disk',5));
+g=flip(g,2);
+imshow(g);
+
+[b,a]=bwlabel(g);
+if(a==1)
+   rp=regionprops(g);
+   fwrite(s,'1');
+   disp('forward acc');
+elseif(a==2)
+    rp=regionprops(g);
+    fwrite(s,'3');
+    disp('reverse');
+else
+    rp=regionprops(g);
+   fwrite(s,'2');
+    disp('no object');
+end
+end
